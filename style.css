@@ -1,131 +1,141 @@
-/* style.css */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #1a1a1a;
+    line-height: 1.5;
 }
 
-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.header {
+    background: #2563eb;
     color: white;
-    padding: 1.5rem 0;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 1rem;
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-header h1 {
-    font-size: 2rem;
-    letter-spacing: 1px;
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
-main {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+.header p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
 }
 
-/* Category Cards */
-.categories-grid {
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Kategoriya kartochkalari */
+.category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
 }
 
 .category-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
 }
 
-.category-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+.category-card:active {
+    transform: scale(0.98);
 }
 
 .category-card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    background-color: #e5e7eb; /* Skeleton loading foni */
+    display: block;
 }
 
-.category-card h2 {
-    padding: 1.5rem;
-    text-align: center;
-    font-size: 1.5rem;
-    color: #667eea;
+.category-info {
+    padding: 1rem;
 }
 
-/* Gallery View */
+.category-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.category-info p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Galereya ko'rinishi */
 .gallery-header {
     display: flex;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .back-btn {
-    background: #667eea;
-    color: white;
+    background: #e5e7eb;
     border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
     cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    margin-right: 1rem;
+    transition: background 0.2s;
 }
 
-.back-btn:hover {
-    background: #764ba2;
-}
-
-.gallery-header h2 {
-    margin-left: 1.5rem;
-    font-size: 2rem;
-    color: #333;
+.back-btn:active {
+    background: #d1d5db;
 }
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
 }
 
 .gallery-item {
-    background: white;
-    border-radius: 10px;
+    aspect-ratio: 1;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
     cursor: pointer;
+    background-color: #e5e7eb;
+    transition: transform 0.2s ease;
 }
 
-.gallery-item:hover {
-    transform: scale(1.05);
+.gallery-item:active {
+    transform: scale(0.95);
 }
 
 .gallery-item img {
     width: 100%;
-    height: 200px;
+    height: 100%;
     object-fit: cover;
     display: block;
 }
 
-/* Lightbox */
+/* Lightbox (To'liq ekran) */
 .lightbox {
     display: none;
     position: fixed;
@@ -133,58 +143,80 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 .lightbox.active {
     display: flex;
+    opacity: 1;
 }
 
 .lightbox img {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    max-width: 95%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 4px;
 }
 
-.lightbox-close {
+.close-btn {
     position: absolute;
-    top: 20px;
-    right: 40px;
+    top: 1rem;
+    right: 1.5rem;
     color: white;
-    font-size: 40px;
-    font-weight: bold;
+    font-size: 2.5rem;
     cursor: pointer;
-    transition: color 0.3s ease;
+    z-index: 1001;
+    line-height: 1;
 }
 
-.lightbox-close:hover {
-    color: #667eea;
+.lightbox-nav {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1rem;
+    pointer-events: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .gallery-header h2 {
-        font-size: 1.5rem;
-    }
-    
-    .categories-grid {
-        grid-template-columns: 1fr;
-    }
-    
+.nav-btn {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.nav-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobil qurilmalar uchun optimallashtirish */
+@media (max-width: 600px) {
     .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
     }
     
-    .gallery-item img {
-        height: 150px;
+    .category-card img {
+        height: 180px;
+    }
+    
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
     }
 }
