@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1e3a8a">
+    <meta name="theme-color" content="#f59e0b">
     <title>Cabix Mebel - Oshxona Modullari Katalogi</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,7 +17,7 @@
     </header>
 
     <main class="catalog-container">
-        <!-- Bosh sahifa - Kategoriyalar -->
+        <!-- Bosh sahifa -->
         <div id="home-view" class="view active">
             <div class="intro-section">
                 <h2>Katalogimiz</h2>
@@ -26,35 +26,23 @@
             <div class="category-grid" id="category-grid"></div>
         </div>
 
-        <!-- Kitob ko'rinishidagi prezentatsiya -->
+        <!-- Kitob ko'rinishi -->
         <div id="book-view" class="view">
-            <div class="book-controls">
-                <button class="control-btn" onclick="goHome()">
-                    <span>←</span> Bosh sahifa
-                </button>
+            <div class="book-header">
+                <button class="back-btn" onclick="goHome()">← Bosh sahifa</button>
                 <div class="page-indicator">
                     <span id="current-page">1</span> / <span id="total-pages">11</span>
                 </div>
-                <div class="zoom-controls">
-                    <button class="control-btn" onclick="zoomIn()">🔍+</button>
-                    <button class="control-btn" onclick="zoomOut()">🔍-</button>
-                    <button class="control-btn" onclick="resetZoom()">↺</button>
-                </div>
             </div>
 
-            <div class="book-wrapper">
+            <div class="book-container">
                 <div class="book" id="book">
                     <!-- Sahifalar JavaScript orqali yaratiladi -->
                 </div>
             </div>
 
-            <div class="book-navigation">
-                <button class="nav-arrow prev" onclick="prevPage()">
-                    <span>❮</span>
-                </button>
-                <button class="nav-arrow next" onclick="nextPage()">
-                    <span>❯</span>
-                </button>
+            <div class="book-hint">
+                <span>↔ Sahifani surib varoqlang</span>
             </div>
         </div>
     </main>
