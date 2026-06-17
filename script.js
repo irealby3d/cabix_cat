@@ -70,4 +70,78 @@ function openBook(catId) {
         pageFlip = new St.PageFlip(flipbookEl, {
             width: 400,       // Baza kenglik
             height: 600,      // Baza balandlik
-            size: 'stretch',  // Ekran o
+            size: 'stretch',  // Ekran o'lchamiga cho'ziladi (Full page)
+            minWidth: 300,
+            maxWidth: 1000,
+            minHeight: 400,
+            maxHeight: 1200,
+            maxShadowOpacity: 0.6, // Varoqlashdagi soya chuqurligi
+            showCover: true,
+            mobileScrollSupport: false // Mobil skrollni o'chirib, faqat varoqlashni yoqish
+        });
+
+        pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+        // Sahifa o'zgarganda indikatorni yangilash
+        pageFlip.on('flip', (e) => {
+            currentPageEl.textContent = e.data + 1;
+            updateButtons();
+        });
+
+        totalPagesEl.textContent = totalPages;
+        updateButtons();
+        
+        showView('book-view');
+    }, 100);
+}
+
+// 3. Tugmalarni holatini yangilash
+function updateButtons() {
+    if (!pageFlip) return;
+    const current = pageFlip.getCurrentPageIndex();
+    const total = pageFlip.getPageCount();
+    
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+}
+
+// 4. Interaktiv varoqlash funksiyalari
+function flipNext() {
+    if (pageFlip) pageFlip.flipNext();
+}
+
+function flipPrev() {
+    if (pageFlip) pageFlip.flipPrev();
+}
+
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function goHome() {
+    showView('home-view');
+    if (pageFlip) {
+        pageFlip.destroy();
+        pageFlip = null;
+    }
+}
+
+// 5. Klaviatura orqali boshqarish
+document.addEventListener('keydown', (e) => {
+    if (!bookView.classList.contains('active') || !pageFlip) return;
+    if (e.key === 'ArrowRight') flipNext();
+    if (e.key === 'ArrowLeft') flipPrev();
+    if (e.key === 'Escape') goHome();
+});
+
+// 6. Ekran o'lchami o'zgarganda kitobni moslashtirish
+window.addEventListener('resize', () => {
+    if (pageFlip) {
+        pageFlip.updateFromHtml(document.querySelectorAll('.page'));
+    }
+});
+
+// Dastlabki yuklash
+renderHome();
