@@ -5,78 +5,27 @@
 'use strict';
 
 const CATS = [
-    { id:'akril',  name:'Akril',  badge:'A1', folder:'AKRIL (A1)',  count:11, desc:'Zamonaviy akril yuzalar kolleksiyasi' },
-    { id:'korpus', name:'Korpus', badge:'K1', folder:'KORPUS (K1)', count:11, desc:'Mustahkam korpus konstruksiyalari'     },
-    { id:'laminat',name:'Laminat',badge:'L1', folder:'LAMINAT (L1)',count:11, desc:'Premium laminat qoplamalar seriyasi'   }
+    { id:'akril',   name:'Akril',   badge:'A1', folder:'AKRIL (A1)',   count:11, desc:'Zamonaviy akril yuzalar kolleksiyasi' },
+    { id:'korpus',  name:'Korpus',  badge:'K1', folder:'KORPUS (K1)',  count:11, desc:'Mustahkam korpus konstruksiyalari'     },
+    { id:'laminat', name:'Laminat', badge:'L1', folder:'LAMINAT (L1)', count:11, desc:'Premium laminat qoplamalar seriyasi'   }
 ];
 
-// ─── State ────────────────────────────────────────────────────────
+// ─── State ───────────────────────────────────────────────────────
 let pf         = null;
 let currentCat = null;
 let zoom       = 1;
 let thumbsOpen = false;
-let _opening   = false;   // ikki marta ochilishini oldini olish
+let _opening   = false;
 
-// ─── DOM helpers ─────────────────────────────────────────────────
+// ─── DOM ─────────────────────────────────────────────────────────
 const $  = id => document.getElementById(id);
-const el = {
-    homeView:      $('home-view'),
-    bookView:      $('book-view'),
-    catGrid:       $('category-grid'),
-    pageInput:     $('page-input'),
-    totalPages:    $('total-pages'),
-    prevBtn:       $('prev-btn'),
-    nextBtn:       $('next-btn'),
-    zoomDisplay:   $('zoom-display'),
-    thumbsPanel:   $('thumbs-panel'),
-    thumbsList:    $('thumbs-list'),
-    thumbsBtn:     $('thumbs-btn'),
-    readerTitle:   $('reader-title'),
-    loadingScreen: $('loading-screen'),
-    zoomWrapper:   $('zoom-wrapper'),
-    flipbookArea:  $('flipbook-area')
-};
-
-// ================================================================
-// AUDIO — bitta doimiy AudioContext, hech qachon yopilmaydi
-// ================================================================
-let _audioCtx = null;
-
-function playFlip() {
-    try {
-        if (!_audioCtx || _audioCtx.state === 'closed') {
-            _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        const ctx = _audioCtx;
-
-        const play = () => {
-            const sr  = ctx.sampleRate;
-            const n   = Math.floor(sr * 0.13);
-            const buf = ctx.createBuffer(1, n, sr);
-            const d   = buf.getChannelData(0);
-            for (let i = 0; i < n; i++) {
-                const t = i / n;
-                const e = t < 0.05 ? t / 0.05 : Math.pow(1 - (t - 0.05) / 0.95, 2.2);
-                d[i] = (Math.random() * 2 - 1) * e * 0.35;
-            }
-            const src = ctx.createBufferSource();
-            src.buffer = buf;
-            const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2800; bp.Q.value=1.2;
-            const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=600;
-            const gn = ctx.createGain(); gn.gain.value=0.7;
-            src.connect(hp); hp.connect(bp); bp.connect(gn); gn.connect(ctx.destination);
-            src.start();
-        };
-
-        ctx.state === 'suspended' ? ctx.resume().then(play).catch(()=>{}) : play();
-    } catch(e) {}
-}
 
 // ================================================================
 // HOME
 // ================================================================
 function renderHome() {
-    el.catGrid.innerHTML = '';
+    const catGrid = $('category-grid');
+    catGrid.innerHTML = '';
     CATS.forEach(cat => {
         const card = document.createElement('div');
         card.className = 'cat-card';
@@ -98,15 +47,15 @@ function renderHome() {
                 </div>
             </div>`;
         card.addEventListener('click', () => openBook(cat.id));
-        el.catGrid.appendChild(card);
+        catGrid.appendChild(card);
     });
 }
 
 // ================================================================
-// OPEN BOOK  ← asosiy tuzatish shu yerda
+// OPEN BOOK
 // ================================================================
 function openBook(catId) {
-    if (_opening) return;               // ikki marta bosishni bloklash
+    if (_opening) return;
     const cat = CATS.find(c => c.id === catId);
     if (!cat) return;
 
@@ -114,23 +63,19 @@ function openBook(catId) {
     currentCat = cat;
 
     showLoading(true);
-
-    // 1) Avvalgi PageFlip'ni yo'q qilamiz
     destroyFlip();
 
-    // 2) Flipbook konteynerini innerHTML bilan TOZALAYMIZ
-    //    (replaceChild emas — bu xavfsizroq)
+    // Flipbook ni tozalaymiz
     const flipEl = $('flipbook');
     flipEl.innerHTML = '';
-    el.thumbsList.innerHTML = '';
+    $('thumbs-list').innerHTML = '';
 
-    // 3) Meta ma'lumotlarni yangilaymiz
-    el.readerTitle.textContent  = `${cat.name.toUpperCase()} (${cat.badge})`;
-    el.totalPages.textContent   = cat.count;
-    el.pageInput.value          = 1;
-    el.pageInput.max            = cat.count;
+    $('reader-title').textContent = `${cat.name.toUpperCase()} (${cat.badge})`;
+    $('total-pages').textContent  = cat.count;
+    $('page-input').value         = 1;
+    $('page-input').max           = cat.count;
 
-    // 4) Sahifa div larini quramiz
+    // Sahifalarni quramiz
     for (let i = 0; i < cat.count; i++) {
         const num = String(i).padStart(2, '0');
         const src = `${enc(cat.folder)}/${num}.webp`;
@@ -142,8 +87,6 @@ function openBook(catId) {
         img.src     = src;
         img.alt     = `Sahifa ${i + 1}`;
         img.loading = i < 3 ? 'eager' : 'lazy';
-        // Rasm yuklanmaganda ham sahifa ko'rinishi uchun
-        img.onerror = function() { this.style.background = '#1a1a1a'; };
         pg.appendChild(img);
         flipEl.appendChild(pg);
 
@@ -153,10 +96,9 @@ function openBook(catId) {
     showView('book');
     resetZoom();
 
-    // 5) PageFlip ni 2 ta frame + 200ms keyin ishga tushiramiz
-    //    (DOM to'liq render bo'lishi uchun)
+    // DOM render bo'lgandan keyin PageFlip ni ishga tushiramiz
     requestAnimationFrame(() => requestAnimationFrame(() => {
-        setTimeout(initPageFlip, 200);
+        setTimeout(initPageFlip, 250);
     }));
 }
 
@@ -191,15 +133,14 @@ function initPageFlip() {
 
         pf.on('flip', e => {
             const pg = e.data;
-            el.pageInput.value = pg + 1;
+            $('page-input').value = pg + 1;
             updateNav();
             activateThumb(pg);
-            playFlip();
         });
 
         pf.on('changeState', updateNav);
-
         updateNav();
+
     } catch(err) {
         console.error('PageFlip xatosi:', err);
     }
@@ -214,10 +155,9 @@ function initPageFlip() {
 function goHome() {
     _opening = false;
     destroyFlip();
-
     const flipEl = $('flipbook');
     if (flipEl) flipEl.innerHTML = '';
-    el.thumbsList.innerHTML = '';
+    $('thumbs-list').innerHTML = '';
     closeThumbs();
     resetZoom();
     showView('home');
@@ -238,25 +178,25 @@ function buildThumb(src, idx) {
     item.dataset.i = idx;
     item.innerHTML = `<img src="${src}" alt="Sahifa ${idx+1}" loading="lazy"><div class="thumb-num">${idx+1}</div>`;
     item.addEventListener('click', () => { if (pf) pf.flip(idx); });
-    el.thumbsList.appendChild(item);
+    $('thumbs-list').appendChild(item);
 }
 
 function activateThumb(idx) {
-    el.thumbsList.querySelectorAll('.thumb-item').forEach((e, i) => e.classList.toggle('on', i === idx));
-    const active = el.thumbsList.querySelector('.thumb-item.on');
+    $('thumbs-list').querySelectorAll('.thumb-item').forEach((e, i) => e.classList.toggle('on', i === idx));
+    const active = $('thumbs-list').querySelector('.thumb-item.on');
     if (active) active.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function toggleThumbs() {
     thumbsOpen = !thumbsOpen;
-    el.thumbsPanel.classList.toggle('open', thumbsOpen);
-    el.thumbsBtn.classList.toggle('on', thumbsOpen);
+    $('thumbs-panel').classList.toggle('open', thumbsOpen);
+    $('thumbs-btn').classList.toggle('on', thumbsOpen);
 }
 
 function closeThumbs() {
     thumbsOpen = false;
-    el.thumbsPanel.classList.remove('open');
-    el.thumbsBtn.classList.remove('on');
+    $('thumbs-panel').classList.remove('open');
+    $('thumbs-btn').classList.remove('on');
 }
 
 // ================================================================
@@ -269,16 +209,16 @@ function jumpToPage(val) {
     if (!pf || !currentCat) return;
     const pg = Math.max(0, Math.min((parseInt(val, 10) || 1) - 1, currentCat.count - 1));
     pf.flip(pg);
-    el.pageInput.value = pg + 1;
+    $('page-input').value = pg + 1;
 }
 
 function updateNav() {
     if (!pf) return;
     const cur   = pf.getCurrentPageIndex();
     const total = pf.getPageCount();
-    el.prevBtn.disabled    = cur <= 0;
-    el.nextBtn.disabled    = cur >= total - 1;
-    el.pageInput.value     = cur + 1;
+    $('prev-btn').disabled  = cur <= 0;
+    $('next-btn').disabled  = cur >= total - 1;
+    $('page-input').value   = cur + 1;
 }
 
 // ================================================================
@@ -288,14 +228,14 @@ const ZOOM_MIN = 0.4, ZOOM_MAX = 3.0, ZOOM_STEP = 0.25;
 
 function setZoom(z) {
     zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
-    el.zoomWrapper.style.transform = `scale(${zoom})`;
-    el.zoomDisplay.textContent     = Math.round(zoom * 100) + '%';
+    $('zoom-wrapper').style.transform = `scale(${zoom})`;
+    $('zoom-display').textContent     = Math.round(zoom * 100) + '%';
 }
 function zoomIn()    { setZoom(zoom + ZOOM_STEP); }
 function zoomOut()   { setZoom(zoom - ZOOM_STEP); }
 function resetZoom() { setZoom(1); }
 
-el.flipbookArea?.addEventListener('wheel', e => {
+$('flipbook-area').addEventListener('wheel', e => {
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     e.deltaY < 0 ? zoomIn() : zoomOut();
@@ -321,15 +261,15 @@ document.addEventListener('fullscreenchange', () => {
 // KEYBOARD
 // ================================================================
 document.addEventListener('keydown', e => {
-    if (!el.bookView.classList.contains('active')) return;
-    if (e.target === el.pageInput) return;
+    if (!$('book-view').classList.contains('active')) return;
+    if (e.target === $('page-input')) return;
     switch(e.key) {
         case 'ArrowRight': case 'ArrowDown': case ' ': e.preventDefault(); flipNext(); break;
         case 'ArrowLeft':  case 'ArrowUp':             e.preventDefault(); flipPrev(); break;
         case 'Escape': goHome(); break;
-        case '+': case '=': e.preventDefault(); zoomIn();     break;
-        case '-':           e.preventDefault(); zoomOut();    break;
-        case '0':           e.preventDefault(); resetZoom();  break;
+        case '+': case '=': e.preventDefault(); zoomIn();    break;
+        case '-':           e.preventDefault(); zoomOut();   break;
+        case '0':           e.preventDefault(); resetZoom(); break;
         case 'f': case 'F': toggleFullscreen(); break;
         case 't': case 'T': toggleThumbs();     break;
     }
@@ -338,10 +278,10 @@ document.addEventListener('keydown', e => {
 // ================================================================
 // PAGE INPUT
 // ================================================================
-el.pageInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { jumpToPage(el.pageInput.value); el.pageInput.blur(); }
+$('page-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { jumpToPage($('page-input').value); $('page-input').blur(); }
 });
-el.pageInput.addEventListener('blur', () => jumpToPage(el.pageInput.value));
+$('page-input').addEventListener('blur', () => jumpToPage($('page-input').value));
 
 // ================================================================
 // RESIZE
@@ -353,12 +293,12 @@ window.addEventListener('resize', () => { if (pf) try { pf.update(); } catch(e) 
 // ================================================================
 function showView(which) {
     if (which === 'book') {
-        el.homeView.classList.remove('active');
-        el.bookView.classList.add('active');
+        $('home-view').classList.remove('active');
+        $('book-view').classList.add('active');
         document.body.style.overflow = 'hidden';
     } else {
-        el.bookView.classList.remove('active');
-        el.homeView.classList.add('active');
+        $('book-view').classList.remove('active');
+        $('home-view').classList.add('active');
         document.body.style.overflow = '';
         window.scrollTo(0, 0);
     }
@@ -367,7 +307,7 @@ function showView(which) {
 // ================================================================
 // LOADING
 // ================================================================
-function showLoading(show) { el.loadingScreen.classList.toggle('show', show); }
+function showLoading(show) { $('loading-screen').classList.toggle('show', show); }
 
 // ================================================================
 // HELPERS
