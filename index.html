@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#f59e0b">
     <title>Cabix Mebel - Oshxona Modullari Katalogi</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Professional PageFlip kutubxonasi -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
 </head>
 <body>
 
@@ -26,24 +28,27 @@
             <div class="category-grid" id="category-grid"></div>
         </div>
 
-        <!-- Kitob ko'rinishi -->
+        <!-- To'liq ekranli Kitob ko'rinishi -->
         <div id="book-view" class="view">
-            <div class="book-header">
-                <button class="back-btn" onclick="goHome()">← Bosh sahifa</button>
+            <div class="book-controls">
+                <button class="control-btn" onclick="goHome()">← Bosh sahifa</button>
                 <div class="page-indicator">
-                    <span id="current-page">1</span> / <span id="total-pages">11</span>
+                    Sahifa: <span id="current-page">1</span> / <span id="total-pages">11</span>
                 </div>
             </div>
 
-            <div class="book-container">
-                <div class="book" id="book">
-                    <!-- Sahifalar JavaScript orqali yaratiladi -->
+            <div class="flipbook-wrapper">
+                <div id="flipbook">
+                    <!-- Sahifalar JavaScript orqali shu yerga joylanadi -->
                 </div>
             </div>
 
-            <div class="book-hint">
-                <span>↔ Sahifani surib varoqlang</span>
+            <div class="flipbook-nav">
+                <button class="nav-btn" id="prev-btn" onclick="flipPrev()">❮ Oldingi</button>
+                <button class="nav-btn" id="next-btn" onclick="flipNext()">Keyingi ❯</button>
             </div>
+            
+            <p class="flip-hint">💡 Sahifani barmoq yoki sichqoncha bilan tortib varoqlang</p>
         </div>
     </main>
 
