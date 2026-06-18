@@ -472,14 +472,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-
-    /* 3D flip animatsiyasi paytida miltillashni kamaytirish — ba'zi
-       mobil GPU'larda transform asosidagi animatsiyalar orqa tomoni
-       ko'rinib ketganda yoki layer qayta tuzilganda yorqin miltillash
-       beradi, shuni oldini olamiz */
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    will-change: transform;
 }
 
 .page img {
@@ -490,29 +482,6 @@ body {
 }
 
 .page.--hard { background: #0f0800; }
-
-/* MUHIM: brauzerning o'zining "rasmni sudrab olish" (native image drag)
-   va uzun bosishda chiqadigan kontekst-menyusi PageFlip'ning o'z
-   barmoq/sichqoncha bilan varoqlash tizimi bilan to'qnashadi — aynan shu
-   "varoq barmoq bilan ketib qolish" holatining eng keng tarqalgan sababi.
-   Shu sabab kitob ichida ularni butunlay o'chiramiz. */
-#flipbook, #flipbook * {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    user-drag: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-}
-
-.page img {
-    /* teginish/bosish hodisalari pastdagi .page'ga (demak PageFlip'ning
-       o'ziga) o'tib ketsin — rasmning o'zi hech qachon alohida
-       "ushlanmasin" */
-    pointer-events: none;
-}
 
 /* Ghost click zones */
 .ghost-zone {
