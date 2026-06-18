@@ -88,10 +88,9 @@ function openBook(catId) {
         pg.className = 'page' + (i === 0 || i === cat.count - 1 ? ' --hard' : '');
 
         const img = document.createElement('img');
-        img.src       = src;
-        img.alt       = `Sahifa ${i + 1}`;
-        img.loading   = i < 3 ? 'eager' : 'lazy';
-        img.draggable = false;
+        img.src     = src;
+        img.alt     = `Sahifa ${i + 1}`;
+        img.loading = i < 3 ? 'eager' : 'lazy';
         pg.appendChild(img);
         flipEl.appendChild(pg);
 
@@ -127,9 +126,7 @@ function initPageFlip() {
             mobileScrollSupport: true,
             usePortrait:         true,
             drawShadow:          true,
-            flippingTime:        700,
-            disableFlipByClick:  true,
-            swipeDistance:       30
+            flippingTime:        700
         });
 
         pf.loadFromHTML(pages);
